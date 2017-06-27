@@ -39,10 +39,13 @@ import java.util.List;
  */
 public abstract class MediaRecorderBase implements Callback, PreviewCallback, IMediaRecorder {
 
+	private static int V_W =  1280;
+	private static int V_H = 720;
+
 	/** 视频宽度 */
-	public static int VIDEO_WIDTH = 640;//1280;
+	public static int VIDEO_WIDTH = V_W;
 	/** 视频高度 */
-	public static int VIDEO_HEIGHT = 480;//720;
+	public static int VIDEO_HEIGHT = V_H;
 
 	/** 未知错误 */
 	public static final int MEDIA_ERROR_UNKNOWN = 1;
@@ -463,8 +466,8 @@ public abstract class MediaRecorderBase implements Callback, PreviewCallback, IM
 		if(flag){
 			mParameters.setPreviewSize(MediaRecorderBase.VIDEO_WIDTH, MediaRecorderBase.VIDEO_HEIGHT);
 		}else{
-			MediaRecorderBase.VIDEO_WIDTH = 1280;
-			MediaRecorderBase.VIDEO_WIDTH = 720;
+			MediaRecorderBase.VIDEO_WIDTH = V_W;
+			MediaRecorderBase.VIDEO_WIDTH = V_H;
 			mParameters.setPreviewSize(MediaRecorderBase.VIDEO_WIDTH, MediaRecorderBase.VIDEO_HEIGHT);
 		}
 

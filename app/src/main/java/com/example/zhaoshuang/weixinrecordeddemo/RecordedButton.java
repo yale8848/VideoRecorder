@@ -131,16 +131,33 @@ public class RecordedButton extends View {
             if(onGestureListener != null) {
                 startAnim(0, 1-zoom);
                 isOpenMode = true;
-                onGestureListener.onLongClick();
+                onGestureListener.onClick();
             }
         }
     };
 
+
+
+
     private float firstX;
     private float firstY;
     private boolean cleanResponse;//清除所有响应
+
+    private boolean mIsMove =false;
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:{
+                myHandler.sendEmptyMessageDelayed(0, animTime);
+                break;
+            }
+        }
+
+        return true;
+    }
+
+    public boolean onTouchEvent1(MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 if (isResponseLongTouch) myHandler.sendEmptyMessageDelayed(0, animTime);
@@ -148,47 +165,50 @@ public class RecordedButton extends View {
                 firstY = downY = event.getRawY();
                 break;
             case MotionEvent.ACTION_MOVE:
-                float moveX = event.getRawX();
-                float moveY = event.getRawY();
+                if (mIsMove){
+                    float moveX = event.getRawX();
+                    float moveY = event.getRawY();
 
-                if (Math.abs(moveX - firstX) > dp5 || Math.abs(moveY - firstY) > dp5) {
-                    if (myHandler.hasMessages(0)) {
-                        cleanResponse = true;
-                        myHandler.removeMessages(0);
+                    if (Math.abs(moveX - firstX) > dp5 || Math.abs(moveY - firstY) > dp5) {
+                        if (myHandler.hasMessages(0)) {
+                            cleanResponse = true;
+                            myHandler.removeMessages(0);
+                        }
                     }
+
+                    float slideX = moveX - downX;
+                    float slideY = moveY - downY;
+                    //跟随手指移动
+                    setX(getX() + slideX);
+                    setY(getY() + slideY);
+                    downX = moveX;
+                    downY = moveY;
                 }
 
-                float slideX = moveX - downX;
-                float slideY = moveY - downY;
-                //跟随手指移动
-                setX(getX() + slideX);
-                setY(getY() + slideY);
-                downX = moveX;
-                downY = moveY;
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                float upX = event.getRawX();
-                float upY = event.getRawY();
+                    float upX = event.getRawX();
+                    float upY = event.getRawY();
 
-                if (!cleanResponse){
-                    if (isResponseLongTouch && !myHandler.hasMessages(0)) {
-                        if (isOpenMode) {
-                            if (onGestureListener != null) onGestureListener.onLift();
-                            closeButton();
-                        }
-                    } else {
-                        myHandler.removeMessages(0);
-                        if (Math.abs(upX - firstX) < dp5 && Math.abs(upY - firstY) < dp5) {
-                            if (onGestureListener != null) onGestureListener.onClick();
+                    if (!cleanResponse){
+                        if (isResponseLongTouch && !myHandler.hasMessages(0)) {
+                            if (isOpenMode) {
+                                if (onGestureListener != null) onGestureListener.onLift();
+                                closeButton();
+                            }
+                        } else {
+                            myHandler.removeMessages(0);
+                            if (Math.abs(upX - firstX) < dp5 && Math.abs(upY - firstY) < dp5) {
+                                if (onGestureListener != null) onGestureListener.onClick();
+                            }
                         }
                     }
-                }
 
-                cleanResponse = false;
-                if(upX != firstX || upY != firstY){//回到原坐标
-                    startMoveAnim();
-                }
+                    cleanResponse = false;
+                    if(upX != firstX || upY != firstY){//回到原坐标
+                        startMoveAnim();
+                    }
                 break;
         }
         return true;

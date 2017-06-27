@@ -47,6 +47,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
     //本次段落是否录制完成
     private boolean isRecordedOver;
 
+    private boolean mIsPause =true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,6 +82,18 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
             }
             @Override
             public void onClick() {
+                mIsPause = !mIsPause;
+
+                if (mIsPause){
+                    isRecordedOver = true;
+                    mMediaRecorder.stopRecord();
+                    changeButton(mMediaObject.getMediaParts().size() > 0);
+                }else{
+                    isRecordedOver = false;
+                    mMediaRecorder.startRecord();
+                    rb_start.setSplit();
+                    myHandler.sendEmptyMessageDelayed(HANDLER_RECORD, 100);
+                }
             }
             @Override
             public void onLift() {
@@ -105,10 +119,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
     private void changeButton(boolean flag){
 
         if(flag){
+            tv_hint.setText("点击继续录制");
             tv_hint.setVisibility(View.VISIBLE);
             rl_bottom.setVisibility(View.VISIBLE);
         }else{
-            tv_hint.setVisibility(View.GONE);
+            //tv_hint.setVisibility(View.GONE);
             rl_bottom.setVisibility(View.GONE);
         }
     }
@@ -157,6 +172,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
                             changeButton(false);
                         }
                         rb_start.setProgress(mMediaObject.getDuration());
+                        int s = mMediaObject.getDuration()/1000;
+                        int m = s/60;
+                        if (m> 0){
+                            s = s%60;
+                        }
+                        tv_hint.setText("已录制 "+m+"分:"+s+"秒");
                         myHandler.sendEmptyMessageDelayed(HANDLER_RECORD, 30);
                     }
                     break;
